@@ -208,7 +208,7 @@ class Tally:
 	
 if __name__ == '__main__': 
 	time = time.time()
-	org = Org('arsonists')
+	org = Org('ardent heavy industries')
 	nicole = User(time, 'nicole', org)
 	ian = User(time, 'ian', org)
 	burstein = User(time, 'burstein', org)
@@ -225,9 +225,16 @@ if __name__ == '__main__':
 	heather.makeProxy(nicole)
 	heather.removeProxy()
 	alice.makeProxy(ed)
-	org.removeUser(time, nicole)
+	# org.removeUser(time, nicole)
 	ed.vote(lunch, 'innout')
 
+	print "organization tree:"
+	print "=================="
+	org.printTree()	
+	
+	print
+
+	print "decision:"	
+	print "=================="
 	lunch.decide()
 	
-	org.printTree()	
