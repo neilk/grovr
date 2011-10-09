@@ -1,0 +1,61 @@
+This may not be relational, especially for versioning it would probably be easier to do
+this as JSON structures. So the boundaries would be more about function, not normalization.
+
+All strings might need some sort of history; consider, the history of the description of a particular option.
+Or, perhaps one might have to make such an option immutable, and then if the text has to change
+votes are released?
+
+This also includes some of my ideas for dealing with the whole gender/nymwars debacle. The basic idea
+is that the idea of login is separated into authorization(org-independent) and profile(org-dependent). 
+A single authorization can have different names/genders for each org. This is the model that Yahoo
+arrived at, to stop security leakages, etc.
+
+Language:
+  - id INT
+  - code (try to stick to ISO 639)
+  - iso639code (in case we can't)
+  - fallbackCode (in case we don't have strings in that lang, defaults to en)
+  - genderCode ( array of strings ) -- what options this lang has for genders
+
+Organization:
+  - id
+  - lang.code (ok, perhaps orgs may use multiple langs, but it gets complex otherwise)
+  - name 
+
+Authorization:
+  - id INT
+  - credentials (probably will be complex, represent in JSON + version)
+
+Profile: (user connects an authorization with an organization)
+  - id
+  - authorization.id
+  - organization.id
+  - handle
+  - profileHtml
+  - gender ( for lang.code of the org )
+  - weight ( cached from whatever proxies, etc this user holds )
+
+Question: (something to be decided)
+  - id 
+  - org.id
+  - description
+
+Options 
+  - id
+  - question.id
+  - description
+
+Vote:
+  - time
+  - profile.id
+  - option.id  
+
+
+
+--------
+When a new question is created, by definition everybody who is in the unproxied users group is voting
+for the "no preference" option. There should be no need to make explicit votes, if we query 
+all the unproxied users, and there is no relevant vote for a user, then we just represent 
+them as "voting" for "no preference".
+
+
