@@ -1,0 +1,60 @@
+The general strategy will be to have the REST API do all the important work of modifying data, and often downloading data.
+
+The web frontend is just one of many possible frontends. It is essentially just enough HTML to start running a 
+"client" which uses the API. A URL represents a set of libraries and an initial configuration for the viewer.
+
+This leaves us open to having multiple frontends. Generally we should not create any functionality that only exists in
+HTML-land.
+
+
+== API design ==
+
+- secure by default. Ideally, https only (is this feasible? Many http libs don't have ssl).
+  - use "edit token" concept to avoid replay attacks
+
+- JSON/JSONp structures only in the body of a response. Can't think of a reason to support other formats at this time.
+
+- pick a strategy and stick to it -- signal errors with HTTP or with 200 OK + error info. The latter is somewhat retarded
+from a REST purist point of view, but for the majority of API consumers it's easier to deal with.
+
+- Avoid UI messages appearing in API results
+
+
+== How the system interacts with the outside world ==
+
+Accurately recording time is surprisingly important to many of our goals.
+
+As much as possible we want this system to be auditable. A decision making system is a high-value target. Logging implies time.
+
+To be auditable by humans, we also want to display the history of a user's positions, proxies, etc. Not just the current state. Again,
+time is important.
+
+For concurrency, we can make use of queues and MVCC. This means that the system is less vulnerable to floods or spikes or hacking.
+
+When determining which user has "won" the decision, this is merely a function of time. The organizations that use the system can decide when
+a vote has closed, etc. This many not even have to be configured at all, as long as the organizations agree when the debate closed. 
+
+=== General API pattern ===
+
+This is my thoughts on a good design... probably difficult to build this all at once
+
+- A useragent transmits a request
+  - If a read request, we try to fulfill it immediately.
+    - If time was not specified, we use current time (pretty much all state requests include time)
+    - Perform request, i.e. "what was the state of decision X in organization Y at time T"
+    - Transmit state back
+  - If a request that changes server state
+    - Obtain a unique ID
+    - Obtain current time
+    - Record the request, uniqueID, current time into transaction queue
+    - Tell them thanks, and give them an API URL they can use to check status of transaction
+
+Meanwhile...
+  - Queue of things that change state is read
+  - Transactions performed by various services
+  - Because time is recorded, these don't have to be very smart about how they insert stuff
+
+  - Some write transactions trigger other info to be cached. For instance, for a decision, every now and then we cache what the current
+    tally of votes comes out to, which is associated with time.
+
+

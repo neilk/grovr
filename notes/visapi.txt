@@ -1,0 +1,32 @@
+Thoughts on JS api for visualization
+
+- graph.refocusOnUser( user, hops, maxNodes ) <-- focus on a node, 
+    - get info for that user 
+    - download a node set of all within N hops, up to M maximum nodes
+    - enter the nodes that we want
+    - once that's done, exit the nodes we don't want
+
+- graph.addUser( user )
+   - enters a user into the graph
+
+- graph.removeUser( user )
+   - exits the user
+
+- user.removeProxy(user)
+    - what you expect… 
+
+- user.addProxy(user, user)
+    - remove a proxy if it exists
+    - add the proxy
+
+The 'no expressed preference' option is the same for all votes: option 0
+Other options get their own unique immutable IDs
+- user.vote( option )
+
+(May have an option to hide the "no expressed preference"…?)
+
+behind the scenes.... data model
+
+array of users, current weights, any other info
+array of proxies
+  -> modify the children handler to use this rather than looking for children property
