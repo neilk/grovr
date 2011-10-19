@@ -225,7 +225,6 @@ Org.prototype = {
   },
 
   getProxyChildren: function(member) {
-    console.log( 'getproxychildren' );
     var org = this;
     var children = undefined;
     // returning empty array for children tends to bollix up tree layout
@@ -236,7 +235,6 @@ Org.prototype = {
   },
 
   setProxy: function(member, targetMember) { 
-    console.log( 'setProxy' );
     // remove it from its proxyparent
     var currentParentNodeId = this.proxyParent[member.id];
     // every member should have a current parent node, unless just created
@@ -256,7 +254,6 @@ Org.prototype = {
   },
 
   setUnproxied: function(member) {
-    console.log( 'setUnproxied' );
     this.setProxy(member, this.ROOT);
   },
 
@@ -271,7 +268,6 @@ Org.prototype = {
   },
 
   createMember: function(name) {
-    console.log( 'createMember' );
     if (!this.isGoodName(name)) {
       console.log("bad name: " + name);
       return false;
