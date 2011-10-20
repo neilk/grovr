@@ -206,6 +206,7 @@ function Org() {
   this.roster = {};
   this.proxyParent = {};
   this.proxyChildren = {};
+  this.questions = [];
 }
 
 Org.prototype = {
@@ -257,11 +258,7 @@ Org.prototype = {
     this.setProxy(member, this.ROOT);
   },
 
-  // lame for now
-  getUniqueId: function() {
-    return _.keys(this.roster).length + 1;
-  },
-
+  
   // lame for now
   isGoodName: function(name) { 
     return typeof name === 'string' && name !== '';
@@ -270,12 +267,16 @@ Org.prototype = {
   createMember: function(name) {
     if (!this.isGoodName(name)) {
       console.log("bad name: " + name);
-      return false;
+      throw 'bad name!';
     }
-    var id = this.getUniqueId();
+    var id = getUniqueId();
     var member = new Member(this, id, name);
     this.roster[id] = member;
     this.setUnproxied(member);
+  },
+
+  addQuestion: function(question) {
+    this.questions.push(question);
   }
 };
 
@@ -283,10 +284,57 @@ function Member(org, id, name) {
   this.org = org;
   this.id = id;
   this.name = name;
+  this.votes = {};
 }
 
 Member.prototype = {
-  
+  vote: function( question, option ) {
+    if ( !question.hasOption( option ) ) {
+      throw 'That question does not have that option';
+    }
+    if (! this.votes[question.id] ) {
+      this.votes[question.id] = [];
+    }
+    this.votes[question.id].push(option);
+  },
+
+  getVote: function(question) {
+    if (this.votes[question.id]) {
+      var votes = this.votes[question.id];
+      var lastVote = votes[votes.length - 1];
+      console.log( "member " + this.id + " did vote: " + lastVote.description );
+      return lastVote;
+    } else {
+      console.log( "member " + this.id + " did not vote " );
+      return null;
+    }
+  },
+
+  getEffectiveVote: function(question) {
+    var root = this.org.getRoot();
+    if ( this === root ) {
+      return null;
+    } else {
+      var parentId = this.org.proxyParent[this.id];
+      var parent;
+      if ( parentId === 0 ) { 
+        parent = root;
+      } else {
+        parent = this.org.roster[ parentId.toString() ];
+      }
+      if ( parent === undefined ) {
+        debugger;
+      } 
+      if ( parent === root ) {
+        // my vote is my vote, if I have one 
+        return this.getVote(question);
+      } else {
+        // my vote is my parent's vote (not counting root)
+        return parent.getEffectiveVote(question);
+      }
+    }
+  }
+
 };
 
 function generateRandomOrg(names, n) {
@@ -298,4 +346,33 @@ function generateRandomOrg(names, n) {
   return org;
 }
 
+function Question( description, options) {
+  this.description = description;
+  this.options = [];
+  this.id = getUniqueId();
+  var question = this;
+  
+  _.each( options, function( optDesc ) {
+    question.options.push( new Option( optDesc ) );
+  } );
+}
+
+Question.prototype = {
+  hasOption: function(option) {
+    return _.contains( this.options, option );
+  }
+};
+
+function Option(description) {
+  this.id = getUniqueId();
+  this.description = description;
+}
+
+// lame for now
+var getUniqueId = ( function(count) {
+  return function() {
+    count++;  // two lines just to pass lint
+    return count;
+  };
+} )(0);
 
