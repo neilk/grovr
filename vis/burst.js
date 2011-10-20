@@ -25,9 +25,19 @@ function draw( org, question, colors ) {
       }
     }
   }
+  function byEffectiveVote(member1, member2) {
+    function getVoteOrMax(member) {
+      var vote = member.getEffectiveVote(question);
+      return vote ? Number(vote.id) : -99999; 
+    }
+    var val1 = getVoteOrMax(member1);
+    var val2 = getVoteOrMax(member2);
+    console.log( member1.name + "(" + val1 + ") " + member2.name + "(" + val2 + ")" );
+    return val2 - val1;
+  }
 
   var partition = d3.layout.partition()
-      .sort(null)
+      .sort(byEffectiveVote)
       .size([2 * Math.PI, r * r])
       .value(function(d) { return 1; })
       .children(function(member) { 
