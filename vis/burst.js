@@ -8,6 +8,15 @@ var vis = d3.select("#chart").append("svg:svg")
   .append("svg:g")
     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
+var colors = [ 
+    '#ff0000',
+    '#ffa000',
+    '#00ffff',
+    '#00ff00',
+    '#00ccff'
+  ];
+
+
 function draw( org, question, colors ) { 
   var optionToColor = {};
   for (var k = 0; k < question.options.length; k++) { 
@@ -67,6 +76,13 @@ function draw( org, question, colors ) {
  
 }
 
+var population = 100;
+// this is from flare.js
+var org = generateRandomOrg(window.names, population);
+var question = new Question( 'Lunch', [ 'pizza', 'chinese', 'falafel' ] );
+org.addQuestion(question);
+
+
 
 // Stash the old values for transition.
 function stash(d) {
@@ -84,13 +100,6 @@ function arcTween(a) {
     return arc(b);
   };
 }
-
-
-var population = 100;
-// this is from flare.js
-var org = generateRandomOrg(window.names, population);
-var question = new Question( 'Lunch', [ 'pizza', 'chinese', 'falafel' ] );
-org.addQuestion(question);
 
 
 var proxies = [];
@@ -119,7 +128,7 @@ doProxies();
 
 var votes = [];
 for ( var j = 1; j < population; j++ ) {
-  if ( Math.random() * 2 > 1 ) {
+  if ( Math.random() * 5 > 1 ) {
     var optionIndex = Math.round( Math.random() * (question.options.length - 1) );
     var option = question.options[optionIndex];
     votes.push( [ j, question, option ] );
@@ -140,15 +149,6 @@ function doVotes() {
   }
 }
 doVotes();
-
-var colors = [ 
-    '#ff0000',
-    '#ffa000',
-    '#00ffff',
-    '#00ff00',
-    '#00ccff'
-  ];
-
 draw(org, question, colors);
 
 

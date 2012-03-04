@@ -1,3 +1,10 @@
+function showLog(s) {
+  console.log(s);
+  var logElt = document.getElementById('log');
+  logElt.appendChild( document.createTextNode(s) );
+  logElt.appendChild( document.createElement( 'br' ) );
+}
+
 window.names = [
 "Jacob",
 "Ethan",
@@ -247,6 +254,9 @@ Org.prototype = {
     }
 
     this.proxyParent[member.id] = targetMember.id;
+    if ( targetMember.id !== 0 ) {
+	    showLog( 'member ' + member.show() + ' proxied to ' + targetMember.show() );
+    }
 
     if (! this.proxyChildren[targetMember.id]) {
       this.proxyChildren[targetMember.id] = {};
@@ -266,7 +276,7 @@ Org.prototype = {
 
   createMember: function(name) {
     if (!this.isGoodName(name)) {
-      console.log("bad name: " + name);
+      showLog("bad name: " + name);
       throw 'bad name!';
     }
     var id = getUniqueId();
@@ -302,10 +312,10 @@ Member.prototype = {
     if (this.votes[question.id]) {
       var votes = this.votes[question.id];
       var lastVote = votes[votes.length - 1];
-      console.log( "member " + this.id + " did vote: " + lastVote.description );
+      showLog( "member " + this.show() + " did vote: " + lastVote.description );
       return lastVote;
     } else {
-      console.log( "member " + this.id + " did not vote " );
+      showLog( "member " + this.show() + " did not vote " );
       return null;
     }
   },
@@ -333,6 +343,10 @@ Member.prototype = {
         return parent.getEffectiveVote(question);
       }
     }
+  },
+
+  show: function() {
+    return this.name + ' (#' + this.id + ')';
   }
 
 };
